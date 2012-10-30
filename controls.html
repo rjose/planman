@@ -4,6 +4,7 @@
     <meta charset="utf-8"/>
     <script src="js/jquery-1.8.2.min.js"></script>
     <script src="js/state-machine.js"></script>
+    <script src="js/task.js"></script>
 </head>
 
 <body>
@@ -16,61 +17,27 @@
     var c = document.getElementById("myCanvas");
     var ctx = c.getContext("2d");
 
-
     // State machine
     var stateMachine = new StateMachine(c);
 
     // TODO: Need a way to re-render everything
-    function renderTask(task) {
-        ctx.save();
-
-        ctx.fillStyle = "#FF0000";
-        // TODO: Use a function that can compute the location and dimensions
-        ctx.fillRect(task.x, task.y, task.width, task.height);
-
-        ctx.restore();
-    }
-
     // TODO: Figure out a better place to store the tasks
     stateMachine.tasks.forEach(function(task) {
-       renderTask(task);
+        task.render(ctx);
     });
 
 
-    function showTaskControls(task) {
-        ctx.save();
-
-        ctx.strokeStyle = "#666666";
-        ctx.lineWidth = 3;
-
-        var leftEdge = task.x + 2,
-            rightEdge = task.x + task.width - 2,
-            bottomEdge = task.y + task.height;
-
-        ctx.moveTo(rightEdge, task.y);
-        ctx.lineTo(rightEdge, bottomEdge);
-        ctx.moveTo(leftEdge, task.y);
-        ctx.lineTo(leftEdge, bottomEdge);
-        ctx.stroke();
-
-        ctx.restore();
-    }
-
     function handleTaskSelected(event) {
         var task = event.detail.task;
-        showTaskControls(task);
+        task.showControls(ctx);
     }
 
-
-    function handleMouseDown(event) {
+    function handleMouseEvent(event) {
         stateMachine.transition(event);
     }
 
-    function handleMouseUp(event) {
-    }
-
-    c.addEventListener("mousedown", handleMouseDown, false);
-    c.addEventListener("mouseup", handleMouseUp, false);
+    c.addEventListener("mousedown", handleMouseEvent, false);
+    c.addEventListener("mouseup", handleMouseEvent, false);
     c.addEventListener("taskSelected", handleTaskSelected, false);
 </script>
 </body>

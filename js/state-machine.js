@@ -1,4 +1,5 @@
 function StateMachine(canvas) {
+    var self = this;
 
     this.canvas = canvas;
     this.state = {name: "START", activeTask: null, activeControl: null};
@@ -8,9 +9,8 @@ function StateMachine(canvas) {
     // TODO: Use time units for task
     // TODO: Find a way to store tasks
     // TODO: Add assignee
-    this.task1 = {type:"Task", name:"Task1", x:0, y:0, width:150, height:75};
+    this.task1 = new Task("Task1", "Rino Jose", 2.0);
     this.tasks = [this.task1];
-    var self = this;
 
 
     // Functions that find elements
@@ -19,22 +19,23 @@ function StateMachine(canvas) {
         // TODO: Iterate over all tasks
         var task = self.task1;
 
-        // TODO: Create a task class that can compute this for me
-        if (y > task.y && y < task.y + task.height) {
-            if (x > task.x && x < task.x + task.width) {
-                result = task;
-            }
-            else {
-                result = "Not task, but Assignee1";
-            }
+        if (task.isInTask(x, y)) {
+            result = task;
         }
         return result;
     }
 
+    // TODO: Move this to a util file
+    function copy(object) {
+        return $.extend(true, {}, object);
+    }
+
     // State transition functions
     function transitionFrom_START(event) {
-        var result = $.extend(true, {}, self.state);
+        console.log("Transition from start");
+        var result = copy(self.state);
         var element = findAnyElement(event.x, event.y);
+        console.dir(element);
 
         if (element && element.type === "Task") {
             result.name = "TASK_SELECTED";
@@ -48,7 +49,14 @@ function StateMachine(canvas) {
         return result;
     }
 
+    function transitionFrom_TASK_SELECTED(event) {
+        var result = copy(self.state);
+        // TODO: Create a task class that has these functions
+        // var inTask = isInTask(event.x, event.y);
+    }
 
+
+    // TODO: Refine transition to be at the level of mousedown and mouseup
     this.transition = function (event) {
         var newState = null;
 
@@ -68,6 +76,10 @@ function StateMachine(canvas) {
         switch (self.state.name) {
             case "START":
                 self.state = transitionFrom_START(event);
+                break;
+
+            case "TASK_SELECTED":
+                self.state = transitionFrom_TASK_SELECTED(event);
                 break;
 
             default:
